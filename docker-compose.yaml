@@ -13,9 +13,10 @@ services:
       MYSQL_PASSWORD: teste123
 
     volumes:
-      - D:\Docker\NextMaria\mariadb\config:/config
-      - D:\Docker\NextMaria\mariadb\data:/var/lib/data
-
+      - /docker/NextcloudServer/mariadb/config:/config
+      - /docker/NextcloudServer/mariadb/data:/var/lib/data
+    networks:
+      - nextcloud_ntw
     ports:
       - 3306:3306
     restart: unless-stopped
@@ -23,17 +24,22 @@ services:
   nextcloud:
     image: lscr.io/linuxserver/nextcloud:latest
     container_name: nextcloud
-    links: 
-      - mariadb
-    depends_on:
-      - mariadb
     environment:
       PUID: 1000
       PGID: 100
       TZ: America/Sao_Paulo
     volumes:
-      - D:\Docker\NextMaria\nextcloud\config:/config
-      - D:\Docker\NextMaria\nextcloud\data:/data
+      - /docker/NextcloudServer/nextcloud/config:/config
+      - /docker/NextcloudServer/nextcloud/data:/data
+    networks:
+      - nextcloud_ntw
     ports:
-      - 8080:80
+      - 443:443
+    depends_on:
+      - mariadb
+    links:
+      - mariadb
     restart: unless-stopped
+networks:
+  nextcloud_ntw:
+    driver: bridge
